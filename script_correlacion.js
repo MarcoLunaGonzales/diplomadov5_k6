@@ -23,7 +23,7 @@ export default function () {
     //let randomIcon = csvData[4].id_icono;
 
     // let url = 'https://api.iconfinder.com/v4/iconsets/${randomIcon}/icons';
-    let url = 'https://api.iconfinder.com/v4/iconsets/'+randomIcon+'/icons';
+    let url = 'https://api.iconfinder.com/v4/iconsets?count=10';
 
     console.log("URL enviada: " + url);
 
@@ -35,7 +35,31 @@ export default function () {
    };
 
     let res = http.get(url, params);
-    console.log('Cuerpo Respuesta: ', res.body);
+    //console.log('Cuerpo Respuesta: ', res.body);
+    
+    let responseBody = JSON.parse(res.body);
+
+    if(responseBody.iconsets){
+        responseBody.iconsets.forEach(iconset => {
+            let userId = iconset.author.user_id;
+            console.log('Usuario ID: ',  userId);
+            
+            if(userId){
+                let userURL = `https://api.iconfinder.com/v4/users/${userId}`;
+                let userRes = http.get(userURL,params);
+
+                check(userRes, {
+                    'status usuario res' : (r) => r.status === 200,
+                });
+
+                console.log('Respuesta peticion User: ',userRes.body);
+            }
+        });
+    }else{
+        console.log('No existen iconos de respuesta.');
+    }
+
+
     check(res,{
         'estado correcto': (r) => r.status === 200,
         'respuesta procesada correctamente': (r) => r.body.includes('total_count'),
