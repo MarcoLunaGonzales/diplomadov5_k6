@@ -1,12 +1,13 @@
 import http from 'k6/http';
-import { sleep } from 'k6';
+import { sleep, check} from 'k6';
 
 export const options = {
     stages: [
-        { duration: '30s', target: 60 },
-        { duration: '30s', target: 80 },
-        { duration: '30s', target: 100 },
+        { duration: '60s', target: 300 },
+        { duration: '60s', target: 500 },
+        { duration: '60s', target: 1000 },
     ],
+    gracefulStop: '5m',
 };
 
 export default function() {
@@ -15,5 +16,8 @@ export default function() {
     // console.log('Cuerpo de la respuesta: ', res.body);
     // console.log('Headers: ', JSON.stringify(res.headers));
     // console.log('Tiempos de respuesta: ', res.timings.duration,'ms');
+    check(res,{
+        'estado correcto': (r) => r.status === 200,
+   });
     sleep(1);
 }
